@@ -1,0 +1,31 @@
+These can be set as per requirement in spark-submit of spark session config:
+
+spark.sql.shuffle.partitions=50/300/any number --specifying number of partitons when shuffling data for joins or aggregations.
+spark.default.parallelism=300/any number --specify default number of partitions in RDDs returned by transformations like join, reduceByKey, and parallelize when not set explicitly by the user. 
+                                         --Note that spark.default.parallelism seems to only be working for raw RDD and is ignored when working with dataframes.
+                                         
+ spark-submit with tuning:
+ 
+--driver-memory 12g 
+--executor-memory 20g 
+--num-executors 29 
+--executor-cores 4 
+--driver-cores 4
+-conf spark.sql.shuffle.partitions=23/anything
+--conf spark.default.parallelism=23 
+
+usin SparConf().set() options while declaring spark session:
+
+spark.driver.memory?
+spark.executor.memory
+spark.executor.instances
+spark.executor.cores
+spark.driver.cores?
+spark.serializer='org.apache.spark.serializer.KryoSerializer'
+spark.shuffle.memoryFraction
+spark.shuffle.safetyFraction
+
+# The memory available to each task is (spark.executor.memory * spark.shuffle.memoryFraction * spark.shuffle.safetyFraction)/spark.executor.cores. 
+Memory fraction and safety fraction default to 0.2 and 0.8 respectively.
+
+spark.yarn.executor.memoryOverhead
