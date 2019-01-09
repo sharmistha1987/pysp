@@ -16,12 +16,35 @@ Instaead use single fetch failure.
 
 Spark Executor:
 
+Tuning executor memory:
+
 executor memory has 4 sections:
 
-
 shuffle memory (most desirable for tuning) -- used to shuffle internal data.Map task while running stores data in shuffle memory.when this memory is fully utilized then starts gettting spilled to diak/buffer which cause delays.Thus increase shuffle memmory for better performance.
-user memory (most desirable for tuning) --
+user memory (most desirable for tuning) -- used for user specific data.
 reserved memory
 memory buffer --
+
+Both shuffle and user memory can be configured using spark.memory.fraction.By default 40% of memory is allocated to user memory.If user memory doesnt need that much then that fraction can be changed using spark.memory.fraction.
+
+Enable Off heap memory:
+
+spark.memory.offHeap.enabled=True
+spark.memory.offHeao.size=3g
+
+(off heap memory - enables user to allocate shuffle data structure to a native memory.Means this memory is not allocated or mananged by JVM memory manager and thus no garbage collection.Hence speedy jobs.)
+
+GC (garbage collection) tuning:
+
+Large in -memory buffer allocated by spark's shuffle operation.
+This humongous allocation affects G1GC (has max size 32 MB) if allocation size is more than 32MB.
+Hence use parallel GC intead of G1GC.USing:
+
+spark.executor.extraJavaOptions=-XX:ParallelGCThreads=4 -XX:+UseParallelGC
+
+
+
+
+
 
 
