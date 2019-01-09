@@ -1,19 +1,20 @@
 
 Spark Driver:
 
-Dynamic Executor Allocation:(for multi tenant environment):
+1.Dynamic Executor Allocation:(for multi tenant environment):
 
 spark.dynamicAllocation.enabled=True --to add/remove executors on fly
 sopark.dynamicAllocation.executorIdleTimeout=2m
 spark.dynamicallocation.minExecutors=1
 spark.dynamicAllocation.maxExecutors=2000
 
-Multi Threaded event processor:
+2.Multi Threaded event processor:
 
 Single Threaded event processor for all listeners(bottleneck - event latency).
 Better to have multi threaded executor where single threaded executor service for each listener (under review)
  
-Better Fetch Failure handling:
+3.Better Fetch Failure handling:
+
 Avoid multiple retries of stages in case of Fetch Failure (increase latency of job and eventually lead to failure of job).
 Instaead use single fetch failure causing single retries instead of multiple rerties.Using:
 spark.max.fetch.failures.per.stage = 10
@@ -21,25 +22,29 @@ spark.max.fetch.failures.per.stage = 10
 
 Spark Executor:
 
-Tuning executor memory:
+1.Tuning executor memory:
 
 executor memory has 4 sections:
 
-shuffle memory (most desirable for tuning) -- used to shuffle internal data.Map task while running stores data in shuffle memory.when this memory is fully utilized then starts gettting spilled to diak/buffer which cause delays.Thus increase shuffle memmory for better performance.
+shuffle memory (most desirable for tuning) -- used to shuffle internal data.Map task while running stores data in shuffle memory.
+when this memory is fully utilized then starts gettting spilled to diak/buffer which cause delays.Thus increase shuffle memmory 
+for better performance.
 user memory (most desirable for tuning) -- used for user specific data.
 reserved memory
 memory buffer --
 
-Both shuffle and user memory can be configured using spark.memory.fraction.By default 40% of memory is allocated to user memory.If user memory doesnt need that much then that fraction can be changed using spark.memory.fraction.
+Both shuffle and user memory can be configured using spark.memory.fraction.By default 40% of memory is allocated to user memory.
+If user memory doesnt need that much then that fraction can be changed using spark.memory.fraction.
 
-Enable Off heap memory:
+2.Enable Off heap memory:
 
 spark.memory.offHeap.enabled=True
 spark.memory.offHeap.size=3g
 
-(off heap memory - enables user to allocate shuffle data structure to a native memory.Means this memory is not allocated or mananged by JVM memory manager and thus no garbage collection.Hence speedy jobs.)
+(off heap memory - enables user to allocate shuffle data structure to a native memory.Means this memory is not allocated or mananged by 
+ JVM memory manager and thus no garbage collection.Hence speedy jobs.)
 
-GC (garbage collection) tuning:
+3.GC (garbage collection) tuning:
 
 Large in -memory buffer allocated by spark's shuffle operation.
 This humongous allocation affects G1GC (has max size 32 MB) if allocation size is more than 32MB.
@@ -55,18 +60,73 @@ Eliminationg disk I/O bottleneck:
  Accessing disk is 10-100K times slower than memory access hence spilling on disk becomes expensive.
  Even if data is small enough to fit in memory,still tuning of disk I/O is required because final shuffle output gets written to disk.
   
- Tune shuffle file buffer: (tune disk I/O)
+ 1.Tune shuffle file buffer: (tune disk I/O)
  
- Make buffer size for dsk I/O configurable.
+ Make buffer size for disk I/O configurable.
  
  spark.shuffle.file.buffer=1MB (default 32KB - too small)
  spark.shuffle.sorter.spill.reader.buffer.size=1MB (defaultlt 32KB - too small)
  
- Optimize spill files merging: (default spill merge process do not do buffered read and write hence perfrmance issue (latency)
+2. Optimize spill files merging: (default spill merge process do not do buffered read and write hence perfrmance issue (latency)
  Using:
  spark.file.transferTo=false (changing to buffered read and write process for spill-merge)
+ 
+ Buffered read write: After temporary files are created on disk after spilling, this process will read multiple partitons of file 
+                      in memory and buffer them.Finally merge the partions and store o/p in memory and only flush to disk if buffer size
+                      increases. Using:
  spark.shuffle.file.buffer=1MB
  spark.shuffle.unsafe.file.output.buffer=5MB
+ 
+ 3.Tune compression block size:
+   Default compression block size of 32kb is too sub optimal in spark.
+   Upto 20% reduction in shuffle/spill file size can be achieved by increasing block size.
+   Using:
+   spark.io.compression.lz4.blockSize=512KB
+   
+  4.Various memory leak fixes and imrovements in executor.
+ 
+ External Shuffle Service:
+ 
+ 
+ Lot of time gets consumed in suffling when dealing with Tbs of data
+ 
+ 1.Cache index files on shuffle server:
+ 
+ (shuffle file produced by map task conatins two parts index file and data file.Index file file is like dictionary to the data where as
+ data file has actual data being consumed by reducer.)
+ 
+ Reading index file(from disk) by shuffle service every time a reducer wants to fetch data from shuffle file is not appropriate as it consumes time ,hence after first index file read
+ it is better to cache that file in shuffle service server so subsequent reads of data doesn't involve reading index file again.
+ Thus it saves 1 disk I/O.
+ 
+ Now as number of map taks increase,number of index files will also increase and thus caching them in memory for speedyy fetch of data
+ will be problem.Hence, use this property to tunre cache entries as needed:
+ 
+ spark.shuffle.service.index.cache.entires=2048
+ 
+ 2. Other configuartions for shuffle service:
+ 
+ Tuneshuffle service worker thread and backlog so taht shuffle service doesn't become unresponsive.
+ 
+ spark.shuffle.io.serverThreads=128
+ spark.shuffle.io.backlog=8192
+ 
+Configure shuffle registartion timeout and retry:
+
+spark.shuffle.registartion.timeout=2m
+spark.shuffle.registration.maxAttempts=5
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+ 
+ 
  
  
  
