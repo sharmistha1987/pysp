@@ -115,6 +115,8 @@ Configure shuffle registartion timeout and retry:
 
 spark.shuffle.registartion.timeout=2m
 spark.shuffle.registration.maxAttempts=5
+
+https://github.com/vaquarkhan/vk-wiki-notes/wiki/Apache-Spark-Join-guidelines-and-Performance-tuning
  
  
  
