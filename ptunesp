@@ -117,6 +117,8 @@ spark.shuffle.registartion.timeout=2m
 spark.shuffle.registration.maxAttempts=5
 
 https://github.com/vaquarkhan/vk-wiki-notes/wiki/Apache-Spark-Join-guidelines-and-Performance-tuning
+
+https://code.fb.com/core-data/apache-spark-scale-a-60-tb-production-use-case/
  
  
  
