@@ -1,1 +1,27 @@
 
+Spark Driver:
+
+Dynamic Executor Allocation:(for multi tenant environment):
+
+spark.dynamicAllocation.enabled=True --to add/remove executors on fly
+sopark.dynamicAllocation.executorIdleTimeout=2m
+spark.dynamicallocation.minExecutors=1
+spark.dynamicAllocation.maxExecutors=2000
+
+Single Threaded event processor for all listeners(bottleneck - event latency).
+Better to have m ulti threaded executor where single threaded executor service for each listener (under review)
+ 
+Avoid multiple retries of stages in case of Fetch Failure (increase latency of job and eventually lead to failure of job).
+Instaead use single fetch failure.
+
+Spark Executor:
+
+executor memory has 4 sections:
+
+
+shuffle memory (most desirable for tuning) -- used to shuffle internal data.Map task while running stores data in shuffle memory.when this memory is fully utilized then starts gettting spilled to diak/buffer which cause delays.Thus increase shuffle memmory for better performance.
+user memory (most desirable for tuning) --
+reserved memory
+memory buffer --
+
+
