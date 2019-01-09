@@ -8,11 +8,16 @@ sopark.dynamicAllocation.executorIdleTimeout=2m
 spark.dynamicallocation.minExecutors=1
 spark.dynamicAllocation.maxExecutors=2000
 
+Multi Threaded event processor:
+
 Single Threaded event processor for all listeners(bottleneck - event latency).
-Better to have m ulti threaded executor where single threaded executor service for each listener (under review)
+Better to have multi threaded executor where single threaded executor service for each listener (under review)
  
+Better Fetch Failure handling:
 Avoid multiple retries of stages in case of Fetch Failure (increase latency of job and eventually lead to failure of job).
-Instaead use single fetch failure.
+Instaead use single fetch failure causing single retries instead of multiple rerties.Using:
+spark.max.fetch.failures.per.stage = 10
+
 
 Spark Executor:
 
@@ -30,7 +35,7 @@ Both shuffle and user memory can be configured using spark.memory.fraction.By de
 Enable Off heap memory:
 
 spark.memory.offHeap.enabled=True
-spark.memory.offHeao.size=3g
+spark.memory.offHeap.size=3g
 
 (off heap memory - enables user to allocate shuffle data structure to a native memory.Means this memory is not allocated or mananged by JVM memory manager and thus no garbage collection.Hence speedy jobs.)
 
@@ -38,9 +43,38 @@ GC (garbage collection) tuning:
 
 Large in -memory buffer allocated by spark's shuffle operation.
 This humongous allocation affects G1GC (has max size 32 MB) if allocation size is more than 32MB.
-Hence use parallel GC intead of G1GC.USing:
+Hence use parallel GC intead of G1GC. Using:
 
 spark.executor.extraJavaOptions=-XX:ParallelGCThreads=4 -XX:+UseParallelGC
+
+Eliminationg disk I/O bottleneck:
+
+ When disk spill occurs?
+ As more and more data gets read by shuffle memory and once the buffer is filled,the extra data is sorted and spilled to disk.
+ This spilling leads map task to produxe various temporary spill files on disk.Thse files are later marged to prodice final shuffle files on disk.
+ Accessing disk is 10-100K times slower than memory access hence spilling on disk becomes expensive.
+ Even if data is small enough to fit in memory,still tuning of disk I/O is required because final shuffle output gets written to disk.
+  
+ Tune shuffle file buffer: (tune disk I/O)
+ 
+ Make buffer size for dsk I/O configurable.
+ 
+ spark.shuffle.file.buffer=1MB (default 32KB - too small)
+ spark.shuffle.sorter.spill.reader.buffer.size=1MB (defaultlt 32KB - too small)
+ 
+ Optimize spill files merging: (default spill merge process do not do buffered read and write hence perfrmance issue (latency)
+ Using:
+ spark.file.transferTo=false (changing to buffered read and write process for spill-merge)
+ spark.shuffle.file.buffer=1MB
+ spark.shuffle.unsafe.file.output.buffer=5MB
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
 
 
 
