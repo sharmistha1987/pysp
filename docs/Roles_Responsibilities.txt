@@ -1,0 +1,29 @@
+Current Job Duties:  
+
+•	Work with State Farm Mutual Funds department’s Business Users to understand their reporting requirements, refine those requirements and finally translate them into Business Intelligence solutions using Business Intelligence tools such as IBM Cognos and Qlikview.
+
+•	Provide end to end technical support for existing Business Intelligence applications ranging from mainframe data processing to ETL workflows to static and ad-hoc reports being used by business users.
+
+•	Work on performance tuning of State Farm’s various Business Intelligence assets so as to enable both field and non-field users meet their various reporting requirements.
+
+•	Work with State Farm to understand their current data processing systems, identify current and potential future problem areas. Design and implement solutions to plug those gaps and mitigate the impact of the problem.
+
+•	Act as a State Farm Mutual Funds technical Subject Matter Expert in order to identify and distribute work between multiple stakeholders in the enterprise due to introduction of new Mutual Funds product or changes are made to an existing Mutual Funds product.
+
+•	Providing advice as well as design and develop customized software and tools for State Farm’s Business Intelligence support team to automate manual and repetitive work utilizing IBM Cognos Software Development Kit.
+
+•	Designing and Implementing data security processes around raw data as well as static or dynamic reports to make sure State Farm Mutual Funds data is kept secure. Submit vulnerability scans on State Farm Mutual Funds servers and take action to fix vulnerabilities that are discovered.
+
+•	Work on analyzing, identifying and correcting Mutual Funds Data issues arising due to problems with daily processing of vendor files.
+
+•	Conduct feasibility study on adoption of recent data processing technologies especially Big Data tools such as Hadoop, Apache Hive and Spark in State Farm’s Mutual Funds data processing. Work on proof of concept projects utilizing these new tools to determine suitability within State Farm environment.
+
+•	Implementing Business Intelligence Life Cycle Development Process that includes - design documents, creating data models and creating static reporting to balanced scorecards to sophisticated quantitative models like Dashboards, Multi Dimensional Cubes using Business Intelligence tools such as IBM Cognos.
+
+•	Design metadata models that comply with the database cardinalities and applying the complex business rules and publish them to the BI environment to develop various BI scorecards, dashboards, and reports.
+
+•	Apply the expertise in database programming.
+
+•	Keep abreast of upcoming upgrades or innovative technology trends in Business Intelligence.
+
+•	Attending status meetings and update the work status to project manager and other stake holders to discuss the progress on issues and maintain application documentation and history of past issues along with resolution.
